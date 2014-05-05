@@ -1,0 +1,22 @@
+package business;
+
+public class TaxLogic {
+	public static double calcTax(double taxIncome, double deductions) {
+		double tax = 0.00;
+		if (deductions == 10000.00) {
+			if (taxIncome < 8925.0) {
+				tax = .10 * taxIncome;
+			}
+			else if (taxIncome < 36250.0) {
+				tax = .10 * 8925.0 + .15 * (taxIncome - 8925.0);
+			}
+			else if (taxIncome < 87851.0) {
+				tax = .10 * 8925 + .15 * (36250 - 8925) 
+						+ .25 * (taxIncome - 36250.0);
+			}
+		} else {
+			// married filing jointly if statements
+		}
+		return tax;
+	}
+}
