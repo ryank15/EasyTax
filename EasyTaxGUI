@@ -1,0 +1,262 @@
+package EasyTax;
+
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+import business.TaxLogic;
+
+/**
+ * EasyTax - a GUI tax calculation program
+ * 
+ * @author Kevin Ryan
+ * @version 1.0 on 4/7/2014
+ */
+public class EasyTax {
+	public EasyTax() {
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				new GUIPanel();
+			}
+		});
+	}
+
+	public static void main(String[] args) {
+		new EasyTax();
+	}
+}
+
+class GUIPanel {
+	private JFrame frame;
+	private JPanel dataPanel;
+	private JMenuItem printMI, exitMI;
+	private JMenuItem aboutMI;
+	private JTextField firstTF, lastTF, ssnTF, spouseFirstTF, spouseLastTF, spouseSsnTF;
+	private JTextField streetTF, cityTF, zipTF, wagesTF, adjGrossTF, interestTF, taxIncomeTF,
+			deductionsTF, taxWithheldTF;
+	private JTextField taxTF;
+	private JLabel result;
+	private JButton calcBtn;
+
+	public GUIPanel() {
+		dataPanel = new JPanel();
+		dataPanel.setLayout(new GridBagLayout());
+		dataPanel.setOpaque(true);
+
+		String[] states = { " ", "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI",
+				"ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO",
+				"MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI",
+				"SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY" };
+
+		JComboBox<?> statesList = new JComboBox<Object>(states);
+		statesList.setSelectedIndex(0);
+		// Basic Information
+		JLabel yourInfo = new JLabel("Your Information");
+		JLabel firstLbl = new JLabel("First Name");
+		firstTF = new JTextField(13);
+		JLabel lastLbl = new JLabel("Last Name");
+		lastTF = new JTextField(10);
+		JLabel SSNLbl = new JLabel("SSN");
+		ssnTF = new JTextField(7);
+		JLabel spouseInfo = new JLabel("Spouse's Information");
+		JLabel spousefirstLbl = new JLabel("First Name");
+		spouseFirstTF = new JTextField(13);
+		JLabel spouselastLbl = new JLabel("Last Name");
+		spouseLastTF = new JTextField(10);
+		JLabel spouseSSNLbl = new JLabel("SSN");
+		spouseSsnTF = new JTextField(7);
+		JLabel street = new JLabel("Street");
+		streetTF = new JTextField(13);
+		JLabel city = new JLabel("City");
+		cityTF = new JTextField(13);
+		JLabel state = new JLabel("State");
+		JLabel zip = new JLabel("Zipcode");
+		zipTF = new JTextField(5);
+
+		// Income Portion
+		JLabel income = new JLabel("Income");
+		JLabel wages = new JLabel("Wages, Salary, and Tips");
+		wagesTF = new JTextField(10);
+		JLabel interest = new JLabel("Taxable Interests");
+		interestTF = new JTextField(10);
+		JLabel adjGross = new JLabel("Adjusted Gross Income");
+		adjGrossTF = new JTextField(10);
+		adjGrossTF.setEditable(false);
+		JLabel taxIncome = new JLabel("Taxable Income");
+		taxIncomeTF = new JTextField(10);
+		taxIncomeTF.setEditable(false);
+		JLabel deductions = new JLabel("Deductions");
+		deductionsTF = new JTextField(10);
+		deductionsTF.setEditable(false);
+		JLabel taxWithheld = new JLabel("Tax Withheld");
+		taxWithheldTF = new JTextField(10);
+		JLabel tax = new JLabel("Tax");
+		taxTF = new JTextField(10);
+		taxTF.setEditable(false);
+
+		result = new JLabel("Result");
+		JButton calc = new JButton("Calculate");
+		calc.addActionListener(new CalcListener());
+
+		// Adding to GUI Panel
+		dataPanel.add(yourInfo, getConstraints(0, 0, 5, 1, "left"));
+		dataPanel.add(firstLbl, getConstraints(0, 1, 1, 1, "right"));
+		dataPanel.add(firstTF, getConstraints(1, 1, 1, 1, "right"));
+		dataPanel.add(lastLbl, getConstraints(2, 1, 1, 1, "right"));
+		dataPanel.add(lastTF, getConstraints(3, 1, 1, 1, "right"));
+		dataPanel.add(SSNLbl, getConstraints(4, 1, 1, 1, "right"));
+		dataPanel.add(ssnTF, getConstraints(5, 1, 1, 1, "right"));
+		dataPanel.add(spouseInfo, getConstraints(0, 2, 1, 1, "left"));
+		dataPanel.add(spousefirstLbl, getConstraints(0, 3, 1, 1, "right"));
+		dataPanel.add(spouseFirstTF, getConstraints(1, 3, 1, 1, "right"));
+		dataPanel.add(spouselastLbl, getConstraints(2, 3, 1, 1, "right"));
+		dataPanel.add(spouseLastTF, getConstraints(3, 3, 1, 1, "right"));
+		dataPanel.add(spouseSSNLbl, getConstraints(4, 3, 1, 1, "right"));
+		dataPanel.add(spouseSsnTF, getConstraints(5, 3, 1, 1, "right"));
+		dataPanel.add(street, getConstraints(0, 4, 1, 1, "right"));
+		dataPanel.add(streetTF, getConstraints(1, 4, 1, 1, "right"));
+		dataPanel.add(city, getConstraints(0, 5, 1, 1, "right"));
+		dataPanel.add(cityTF, getConstraints(1, 5, 1, 1, "right"));
+		dataPanel.add(state, getConstraints(2, 5, 1, 1, "right"));
+		dataPanel.add(statesList, getConstraints(3, 5, 1, 1, "left"));
+		dataPanel.add(zip, getConstraints(4, 5, 1, 1, "right"));
+		dataPanel.add(zipTF, getConstraints(5, 5, 1, 1, "left"));
+		// Calculations add to GUI
+		dataPanel.add(income, getConstraints(0, 6, 1, 1, "left"));
+		dataPanel.add(wages, getConstraints(0, 7, 1, 1, "left"));
+		dataPanel.add(wagesTF, getConstraints(1, 7, 1, 1, "left"));
+		dataPanel.add(interest, getConstraints(2, 7, 1, 1, "left"));
+		dataPanel.add(interestTF, getConstraints(3, 7, 1, 1, "left"));
+		dataPanel.add(adjGross, getConstraints(0, 8, 1, 1, "left"));
+		dataPanel.add(adjGrossTF, getConstraints(1, 8, 1, 1, "left"));
+		dataPanel.add(deductions, getConstraints(2, 8, 1, 1, "right"));
+		dataPanel.add(deductionsTF, getConstraints(3, 8, 1, 1, "left"));
+		dataPanel.add(taxIncome, getConstraints(0, 9, 1, 1, "left"));
+		dataPanel.add(taxIncomeTF, getConstraints(1, 9, 1, 1, "left"));
+		dataPanel.add(taxWithheld, getConstraints(0, 10, 1, 1, "left"));
+		dataPanel.add(taxWithheldTF, getConstraints(1, 10, 1, 1, "left"));
+		dataPanel.add(tax, getConstraints(2, 10, 1, 1, "right"));
+		dataPanel.add(taxTF, getConstraints(3, 10, 1, 1, "left"));
+		dataPanel.add(result, getConstraints(0, 11, 1, 1, "left"));
+		dataPanel.add(calc, getConstraints(7, 11, 1, 1, "right"));
+
+		frame = new JFrame("Kevin's Easy Tax");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setJMenuBar(createMenuBar());
+		frame.setContentPane(dataPanel);
+		frame.pack();
+		// frame.setSize(800, 400);
+		frame.setLocation(275, 100);
+		frame.setResizable(false);
+		frame.setVisible(true);
+	} // end GUIPanel constructor
+
+	public JMenuBar createMenuBar() {
+		JMenuBar menuBar;
+		JMenu menu;
+
+		menuBar = new JMenuBar();
+
+		menu = new JMenu("File");
+		menu.setMnemonic(KeyEvent.VK_F);
+		menuBar.add(menu);
+
+		printMI = new JMenuItem("Print...");
+		printMI.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					frame.print(null);
+				} catch (Exception pe) {
+					
+				}
+			}
+		});
+		menu.add(printMI);
+
+		exitMI = new JMenuItem("Exit");
+		exitMI.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.exit(0);
+			}
+		});
+		menu.add(exitMI);
+
+		menu = new JMenu("Help");
+		menu.setMnemonic(KeyEvent.VK_H);
+		menuBar.add(menu);
+
+		aboutMI = new JMenuItem("About");
+		aboutMI.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JOptionPane.showMessageDialog(dataPanel, "GUI by Kevin Ryan 2014.04.07", "About",
+						JOptionPane.INFORMATION_MESSAGE);
+			}
+		});
+		menu.add(aboutMI);
+
+		return menuBar;
+	} // end createMenuBar
+
+	private GridBagConstraints getConstraints(int gridx, int gridy, int gridwidth, int gridheight,
+			String justify) {
+		GridBagConstraints c = new GridBagConstraints();
+		c.insets = new Insets(5, 5, 5, 5);
+		c.ipadx = 0;
+		c.ipady = 0;
+		c.gridx = gridx;
+		c.gridy = gridy;
+		c.gridwidth = gridwidth;
+		c.gridheight = gridheight;
+		if (justify.equalsIgnoreCase("Left")) {
+			c.anchor = GridBagConstraints.WEST;
+		} else {
+			c.anchor = GridBagConstraints.EAST;
+		}
+		return c;
+	}
+
+	class CalcListener implements ActionListener {
+
+		double deductions = 0.0;
+		double wages = 0.0;
+		double interest = 0.0;
+		double adjGross = 0.0;
+		double taxableIncome = 0.0;
+				
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			String spouse = spouseFirstTF.getText();
+			System.out.println("spouse=" + spouse.length());
+			if(spouse.length()==0) 
+				deductions = 10000.00;
+			else
+				deductions = 20000.00;
+			deductionsTF.setText(String.format(("%3.2f"), deductions));
+			wages = Double.parseDouble(wagesTF.getText());
+			interest = Double.parseDouble(interestTF.getText());
+			adjGross = wages + interest;
+			adjGrossTF.setText(String.format(("%3.2f"), adjGross));
+			taxableIncome = adjGross - deductions;
+			taxIncomeTF.setText(String.format(("%3.2f"), taxableIncome));
+			taxTF.setText(String.format(("%3.2f"), 
+					TaxLogic.calcTax(taxableIncome, deductions)));
+		}
+	}
+} // end class GUIPanel
+
